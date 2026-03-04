@@ -378,11 +378,11 @@ class BVEMenuDialog(wx.Dialog):
         wx.LaunchDefaultBrowser("https://disk.yandex.com/d/3g6doo21r3BOyg")
 
     def on_contact(self, _):
-        d = ContactDialog(self)
         try:
-            d.ShowModal()
-        finally:
-            d.Destroy()
+            self.EndModal(wx.ID_CANCEL)
+        except Exception:
+            self.Destroy()
+        wx.CallAfter(self.parent.open_contact_dialog)
 
 # ================= VİDEO ÖZELLİKLERİ =================
 class VideoPropertiesDialog(wx.Dialog):
@@ -3483,6 +3483,13 @@ class Editor(wx.Frame):
             return fname
         return docs["tr"][key]
 
+    def open_contact_dialog(self):
+        d = ContactDialog(self)
+        try:
+            d.ShowModal()
+        finally:
+            d.Destroy()
+
     def _open_text_help(self, filename, title):
         path = self._doc_file_path(filename)
         if not os.path.exists(path):
@@ -4048,13 +4055,13 @@ class Editor(wx.Frame):
             self.volume = max(0, self.volume - 10)
             self._apply_player_volume()
             audio_speak = self.speech_opts.get("status_audio", True)
-            self.say(f"Ses: {self.volume}%", speak=audio_speak, update_status=audio_speak)
+            self.say(_translate_format("Ses: {volume}%", volume=self.volume), speak=audio_speak, update_status=audio_speak)
             self._mark_project_dirty()
         elif k == wx.WXK_F4:
             self.volume = min(300, self.volume + 10)
             self._apply_player_volume()
             audio_speak = self.speech_opts.get("status_audio", True)
-            self.say(f"Ses: {self.volume}%", speak=audio_speak, update_status=audio_speak)
+            self.say(_translate_format("Ses: {volume}%", volume=self.volume), speak=audio_speak, update_status=audio_speak)
             self._mark_project_dirty()
         else:
             e.Skip()
@@ -5168,7 +5175,7 @@ class Editor(wx.Frame):
                 wx.CallAfter(lambda: self.say("İşlem iptal edildi", speak=file_speak, update_status=file_speak))
                 return
             error_speak = self.speech_opts.get("status_errors", True)
-            wx.CallAfter(lambda: self.say(f"Hata: {str(ex)}", speak=error_speak, update_status=error_speak))
+            wx.CallAfter(lambda: self.say(_translate_format("Hata: {error}", error=str(ex)), speak=error_speak, update_status=error_speak))
             wx.CallAfter(self._show_error_dialog, f"Hata: {str(ex)}", "Hata")
         finally:
             wx.CallAfter(self._clear_active_progress, progress)
@@ -5236,7 +5243,7 @@ class Editor(wx.Frame):
                 wx.CallAfter(lambda: self.say("İşlem iptal edildi", speak=file_speak, update_status=file_speak))
                 return
             error_speak = self.speech_opts.get("status_errors", True)
-            wx.CallAfter(lambda: self.say(f"Hata: {str(ex)}", speak=error_speak, update_status=error_speak))
+            wx.CallAfter(lambda: self.say(_translate_format("Hata: {error}", error=str(ex)), speak=error_speak, update_status=error_speak))
             wx.CallAfter(self._show_error_dialog, f"Hata: {str(ex)}", "Hata")
         finally:
             wx.CallAfter(self._clear_active_progress, progress)
